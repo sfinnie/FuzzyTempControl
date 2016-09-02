@@ -15,6 +15,6 @@ An implementatation of the Fuzzy Control tutorial [here](http://www.facstaff.buc
     
 1. Start RStudio
 1. Open the `FuzzyLogicExample.Rproj` project
-1. Open `fuzzy-sample.R` & run it.
+1. Open `fuzzy-sample.R` & run it (`Ctrl-Shift-Enter` on Linux/Windows, `Cmd-Shift-Enter` on Mac).
 
 
