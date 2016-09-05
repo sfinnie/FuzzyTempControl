@@ -11,7 +11,7 @@ sets_options("universe", seq(from = -200, to = 200, by = 1))
 
 #------------------------------------------------------------------------------------------
 # Membership Functions for measured temp
-temp_cold_memshp_fn = fuzzy_trapezoid(corners=c(-100, -99, 40, 70))
+temp_cold_memshp_fn = fuzzy_trapezoid(corners=c(-101, -100, 40, 70))
 temp_ok_memshp_fn = fuzzy_triangular(corners=c(40,70,100))
 temp_hot_memshp_fn = fuzzy_trapezoid(corners=c(70, 100, 200, 201))
 
@@ -68,9 +68,17 @@ get_ctrl_response <- function(fuzzy_system, temp) {
 
 
 #------------------------------------------------------------------------------------------
-# Example
+# Examples
 # If the measured temperature is 80 degrees, what's the control effort?
 get_ctrl_response(system, 80)
+
+#What does the ctrl response look like over temp range?
+temps <- seq(from= 0, to=100, by=1)
+ctrls <- NULL
+for (i in temps) {
+  ctrls[i] = get_ctrl_response(system, temps[i])
+}
+plot(ctrls)
 
 ## reset universe
 sets_options("universe", NULL)
