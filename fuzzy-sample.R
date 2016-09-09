@@ -22,15 +22,15 @@ plot_temp_memshp_fns <- function () {
 }
 
 #------------------------------------------------------------------------------------------
-# Membership Functions for control effort
-ctrl_low_memshp_fn =  fuzzy_triangular(corners=c(-50,0,50))
-ctrl_med_memshp_fn =  fuzzy_triangular(corners=c(0, 50, 100))
-ctrl_high_memshp_fn = fuzzy_triangular(corners=c(50, 100, 150))
+# Membership Functions for heating control effort
+heat_low_memshp_fn =  fuzzy_triangular(corners=c(-50,0,50))
+heat_med_memshp_fn =  fuzzy_triangular(corners=c(0, 50, 100))
+heat_high_memshp_fn = fuzzy_triangular(corners=c(50, 100, 150))
 
-plot_ctrl_memshp_fns <- function() {
-  plot(ctrl_low_memshp_fn, xlim=c(-50,150), col="yellow")
-  plot(ctrl_med_memshp_fn, xlim=c(-50,150), col="green", add=TRUE)
-  plot(ctrl_high_memshp_fn, xlim=c(-50,150), col="purple", add=TRUE)
+plot_heat_memshp_fns <- function() {
+  plot(heat_low_memshp_fn, xlim=c(-50,150), col="yellow")
+  plot(heat_med_memshp_fn, xlim=c(-50,150), col="green", add=TRUE)
+  plot(heat_high_memshp_fn, xlim=c(-50,150), col="purple", add=TRUE)
 }
 
 #------------------------------------------------------------------------------------------
@@ -40,18 +40,18 @@ variables <-
     temp = fuzzy_variable(cold   = temp_cold_memshp_fn,
                           ok     = temp_ok_memshp_fn,
                           hot    = temp_hot_memshp_fn),
-    ctrl = fuzzy_variable(small  = ctrl_low_memshp_fn,
-                          med    = ctrl_med_memshp_fn,
-                          large  = ctrl_high_memshp_fn)
+    heat = fuzzy_variable(low  = heat_low_memshp_fn,
+                          med    = heat_med_memshp_fn,
+                          high  = heat_high_memshp_fn)
   )
 
 #------------------------------------------------------------------------------------------
 # Fuzzy Rules
 rules <-
   set(
-    fuzzy_rule(temp %is% cold, ctrl %is% large),
-    fuzzy_rule(temp %is% ok,   ctrl %is% med),
-    fuzzy_rule(temp %is% hot,  ctrl %is% small)
+    fuzzy_rule(temp %is% cold, heat %is% high),
+    fuzzy_rule(temp %is% ok,   heat %is% med),
+    fuzzy_rule(temp %is% hot,  heat %is% low)
   )
 
 #------------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ system <- fuzzy_system(variables, rules)
 print(system)
 plot(system)
 
-get_ctrl_response <- function(fuzzy_system, temp) {
+get_heat_response <- function(fuzzy_system, temp) {
   fi <- fuzzy_inference(fuzzy_system, list(temp=temp))
 #  plot(fi)
   return(gset_defuzzify(fi, "centroid"))
@@ -70,15 +70,15 @@ get_ctrl_response <- function(fuzzy_system, temp) {
 #------------------------------------------------------------------------------------------
 # Examples
 # If the measured temperature is 80 degrees, what's the control effort?
-get_ctrl_response(system, 80)
+get_heat_response(system, 80)
 
-#What does the ctrl response look like over temp range?
+#What does the heat response look like over temp range?
 temps <- seq(from= 0, to=100, by=1)
-ctrls <- NULL
+heats <- NULL
 for (i in temps) {
-  ctrls[i] = get_ctrl_response(system, temps[i])
+  heats[i] = get_heat_response(system, temps[i])
 }
-plot(ctrls)
+plot(heats)
 
 ## reset universe
 sets_options("universe", NULL)
